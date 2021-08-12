@@ -14,11 +14,11 @@ The map sheet contains 4 columnn:
 # Code structure
 The code.R file contains the entire code for creating each variable. current_year needs to be reset every year. Code might require modifications every year depending on data dictionary each year.
 
-#How to use for adding new year
+# How to use for adding new year
 1. Create map in excel sheet for new year. Use previous years and exisiting sas code logic for each variable to create all variables.
 2. Use excel map to modify code and then merge with master file.
 
-#Note
+# Note
 Every year the format for aha file can change and many variables can be missing, in such a case those variables will remain empty for that year in master file too.
 
 
