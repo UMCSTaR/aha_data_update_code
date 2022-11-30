@@ -2,13 +2,18 @@ library(dplyr)
 library(magrittr)
 library(haven)
 #read aha file currently in use
-aha_17 <- read_sas("/Volumes/George_Surgeon_Projects/standardized_medicare_data_using_R/input/aha_hosp_05_17.sas7bdat")
+# Read in the previous version for checks
+# aha_17 <- read_sas("/Volumes/DMH_Shared/George_Surgeon_Projects/standardized_medicare_data_using_R/input/archive/aha_hosp_05_17.sas7bdat")
+aha_18_corrected = read.csv('/Volumes/DMH_Shared/George_Surgeon_Projects/standardized_medicare_data_using_R/input/aha_hosp_05_18_corrected.csv')
+# aha_18 = read.csv('/Volumes/DMH_Shared/George_Surgeon_Projects/standardized_medicare_data_using_R/input/aha_hosp_05_18.csv')
 
 #read aha file for new year
-aha_18 <- read_sas("/Volumes/DMH_Shared/Resources/Provider/AHA_American_Hosp_Assoc_Survey/SAS_Data_Files/AHA2018/aha2018.sas7bdat")
+# aha_18 <- read_sas("/Volumes/DMH_Shared/Resources/Provider/AHA_American_Hosp_Assoc_Survey/SAS_Data_Files/AHA2018/aha2018.sas7bdat")
+aha_19 = read_sas('/Volumes/DMH_Shared/Resources/Provider/AHA_American_Hosp_Assoc_Survey/SAS_Data_Files/AHA2019/AS2019PUB.sas7bdat')
+# aha_19 = read.csv('/Volumes/DMH_Shared/George_Surgeon_Projects/standardized_medicare_data_using_R/input/aha_hosp_05_19.csv')
 
 #set year (should be the year processing)
-current_year = 2018
+current_year = 2019
 
 #extract mapped variables, refer to variable map in data folder
 aha_new <- aha_18 %>% 
@@ -22,8 +27,8 @@ aha_new <- aha_18 %>%
          MAPP2, 
          MAPP3, 
          MAPP5, 
-         MAPP12,
-         MAPP13, 
+         # MAPP12, # Retired in 2019. Check pg 5 of /Volumes/DMH_Shared/Resources/Provider/AHA_American_Hosp_Assoc_Survey/SAS_Data_Files/AHA2019 AnnualSurveyFY2019Doc.pdf
+         # MAPP13, # Retired in 2019. Check pg 5 of /Volumes/DMH_Shared/Resources/Provider/AHA_American_Hosp_Assoc_Survey/SAS_Data_Files/AHA2019 AnnualSurveyFY2019Doc.pdf
          MAPP8,
          MAPP19,
          FTERN,
@@ -65,23 +70,27 @@ aha_new <- aha_18 %>%
          year = current_year,
          AHAID = ID,
          provteach = ifelse(MAPP8 == 1,1,0),
-         provteach_all = ifelse((MAPP3 == 1 | MAPP5 == 1 | MAPP12 == 1 | MAPP13 == 1 | MAPP8== 1),1,0),
-         provteach_minor = ifelse((MAPP3 == 1 | MAPP5 == 1 | MAPP12 == 1 | MAPP13 == 1),1,0),
+         ## Logic for pre 2019 data
+         # provteach_all = ifelse((MAPP3 == 1 | MAPP5 == 1 | MAPP12 == 1 | MAPP13 == 1 | MAPP8== 1),1,0),
+         # provteach_minor = ifelse((MAPP3 == 1 | MAPP5 == 1 | MAPP12 == 1 | MAPP13 == 1),1,0),
+         ## Logic for post 2019 data
+         provteach_all = ifelse((MAPP3 == 1 | MAPP5 == 1 | MAPP8== 1),1,0),
+         provteach_minor = ifelse((MAPP3 == 1 | MAPP5 == 1 ),1,0),
          rntopt = ifelse(ADJADC>0,(FTERN/ADJADC),NA),
          RN_BED_ratio = ifelse(HOSPBD>0,round((FTERN/HOSPBD),.01),NA),
          nurse_ratio2 = ifelse(IPDTOT>0,(FTERN/IPDTOT*1000),NA),
          nurse_ratio = ifelse(IPDTOT>0,round((FTERN/IPDTOT),0.01),NA),
          bedsize_cat = ifelse(HOSPBD >= 500, 4, 
                               (ifelse(HOSPBD < 200, 1,
-                                      (ifelse((200 <= HOSPBD && HOSPBD <= 349),2,3))))),
+                                      (ifelse((200 <= HOSPBD & HOSPBD <= 349),2,3))))),
          bedsize_cat2 = ifelse(HOSPBD >= 500, 3, 
                                ifelse(HOSPBD < 250,1,2)),
          beds_lt200 = ifelse((HOSPBD < 200),1,0),
-         beds_200_349 = ifelse((200 <= HOSPBD && HOSPBD <= 349),1,0),
-         beds_350_499 = ifelse((350 <= HOSPBD && HOSPBD <= 499),1,0),
+         beds_200_349 = ifelse((200 <= HOSPBD & HOSPBD <= 349),1,0),
+         beds_350_499 = ifelse((350 <= HOSPBD & HOSPBD <= 499),1,0),
          beds_ge500 = ifelse((HOSPBD > 500),1,0),
          beds_lt250 = ifelse((HOSPBD < 250),1,0),
-         beds_250_499 = ifelse((250 <= HOSPBD && HOSPBD <= 499),1,0),
+         beds_250_499 = ifelse((250 <= HOSPBD & HOSPBD <= 499),1,0),
          region_ne = NA,
          region_west = NA,
          region_midwest = NA,
@@ -165,7 +174,17 @@ aha_new <- aha_18 %>%
          trauma_level3,
          trauma_level45)
 
-#merge with old file to create updated file
-aha_hosp_05_18 <- rbind(aha_17,aha_new) 
+# Diagnostic code check for hosp beds.
+# aha_new %>% group_by(bedsize_cat) %>% count()
+# aha_17 %>% group_by(bedsize_cat) %>% count()
+# aha_18 %>% group_by(bedsize_cat) %>% count()
+# aha_18_corrected %>% group_by(bedsize_cat) %>% count()
+# aha_19 %>% group_by(bedsize_cat) %>% count()
 
-write.csv(aha_hosp_05_18,"/Volumes/George_Surgeon_Projects/standardized_medicare_data_using_R/input/aha_hosp_05_18.csv")
+#merge with old file to create updated file
+# aha_hosp_05_18 <- rbind(aha_17,aha_new)
+aha_hosp_05_19 <- rbind(aha_18_corrected, aha_new)
+
+# write.csv(aha_hosp_05_18,"/Volumes/DMH_Shared/George_Surgeon_Projects/standardized_medicare_data_using_R/input/aha_hosp_05_18_corrected.csv", row.names = F)
+write.csv(aha_hosp_05_19,"/Volumes/DMH_Shared/George_Surgeon_Projects/standardized_medicare_data_using_R/input/aha_hosp_05_19.csv", row.names = F)
+
