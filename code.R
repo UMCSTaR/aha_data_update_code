@@ -2,7 +2,7 @@ library(dplyr)
 library(magrittr)
 library(haven)
 #read aha file currently in use
-aha_17 <- read_sas("/Volumes/George_Surgeon_Projects/standardized_medicare_data_using_R/input/aha_hosp_05_17.sas7bdat")
+aha_17 <- read_sas("/Volumes/George_Surgeon_Projects/standardized_medicare_data_using_R/input/archive/aha_hosp_05_17.sas7bdat")
 
 #read aha file for new year
 aha_18 <- read_sas("/Volumes/DMH_Shared/Resources/Provider/AHA_American_Hosp_Assoc_Survey/SAS_Data_Files/AHA2018/aha2018.sas7bdat")
@@ -13,6 +13,7 @@ current_year = 2018
 #extract mapped variables, refer to variable map in data folder
 aha_new <- aha_18 %>% 
   select(MCRNUM, 
+         REG,
          MLOCZIP, 
          ID, 
          HOSPBD, 
@@ -82,11 +83,14 @@ aha_new <- aha_18 %>%
          beds_ge500 = ifelse((HOSPBD > 500),1,0),
          beds_lt250 = ifelse((HOSPBD < 250),1,0),
          beds_250_499 = ifelse((250 <= HOSPBD && HOSPBD <= 499),1,0),
-         region_ne = NA,
-         region_west = NA,
-         region_midwest = NA,
-         region_south = NA,
-         region_cat = NA,
+         region_ne = ifelse((REG==1 | REG==2),1,0),
+         region_west = ifelse((REG==8 | REG==9),1,0),
+         region_midwest = ifelse((REG==4 | REG==6),1,0),
+         region_south = ifelse((REG==3 | REG==5 | REG==7 | REG==0),1,0),
+         region_cat = ifelse((REG==1 | REG==2),"North-East",
+                             ifelse((REG==8 | REG==9),"West",
+                                    ifelse((REG==4 | REG==6),"Mid-west",
+                                           ifelse((REG==3 | REG==5 | REG==7 | REG==0),"South", NA)))),
          urban = ifelse(MAPP19 == 1,0,1),
          cbsa_rural = ifelse(CBSATYPE == "Rural",1,0),
          cbsa_urban = ifelse(CBSATYPE != "Rural",1,0),
