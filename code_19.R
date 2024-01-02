@@ -169,5 +169,6 @@ aha_new <- aha_19 %>%
 
 #merge with old file to create updated file
 aha_hosp_05_19 <- rbind(aha_18,aha_new) 
+aha_hosp_05_19$PRVNUMGRP = as.character(aha_hosp_05_19$PRVNUMGRP)
 
-write.csv(aha_hosp_05_19,"X:/George_Surgeon_Projects/standardized_medicare_data_using_R/input/aha_hosp_05_19.csv")
+fwrite(aha_hosp_05_19,"X:/George_Surgeon_Projects/standardized_medicare_data_using_R/input/aha_hosp_05_19.csv")
