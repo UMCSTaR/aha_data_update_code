@@ -12,7 +12,7 @@ The map sheet contains 4 columnn:
 4. "FROM SAS"column contains the code for each variable written in sas. The full sas code is included in the repo called aha_hosp_attribute.sas. This file can be referred to in case of any confusion. 
 
 # Code structure
-The code.R file contains the entire code for creating each variable. current_year needs to be reset every year. Code might require modifications every year depending on data dictionary each year.
+The code.R file contains the entire code for creating each variable. current_year needs to be reset every year. Code might require modifications every year depending on data dictionary each year. Hence code19.R is for year 2019.
 
 # How to use for adding new year
 1. Create map in excel sheet for new year. Use previous years and exisiting sas code logic for each variable to create all variables.
