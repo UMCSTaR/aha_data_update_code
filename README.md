@@ -9,7 +9,7 @@ The map sheet contains 4 columnn:
 1. "REQUIRED VAR NAME" contains the variable name used in master aha file
 2. "DESCRIPTION" contains the defition of each variable. These definitions can be directly picked from the source file or may be calculated using other variables in source file. The requirement for each variable is outlined in its description.
 3. "VAR NAMES UPTO 2017" conatins all of the variables needed to be extracted from new aha file. Variable names often change across years and a combination of description and data dictionary is used to determine the correct source variablee.
-4."FROM SAS"column contains the code for each variable written in sas. The full sas code is included in the repo called aha_hosp_attribute.sas. This file can be referred to in case of any confusion. 
+4. "FROM SAS"column contains the code for each variable written in sas. The full sas code is included in the repo called aha_hosp_attribute.sas. This file can be referred to in case of any confusion. 
 
 # Code structure
 The code.R file contains the entire code for creating each variable. current_year needs to be reset every year. Code might require modifications every year depending on data dictionary each year.
